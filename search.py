@@ -21,14 +21,14 @@ def get_params():
     if args.color and args.machine:
         error = "--color and --machine are mutually exclusive, please choose only one.\n"
         sys.stderr.write(f"ArgumentError: {error}")
-        raise argparse.ArgumentError(None, error)
+        exit(2)
     if args.color:
         try:
             getattr(Colors, args.color.upper())
         except AttributeError:
             error = f"Unsupported color: {args.color}"
-            sys.stderr.write(f"ArgumentError: {error}")
-            raise argparse.ArgumentError(None, error)
+            sys.stderr.write(f"AttributeError: {error}")
+            exit(3)
     return args
 
 
@@ -47,9 +47,7 @@ def print_result(file_name, line_no, start_pos, match):
         print_machine(file_name, line_no, start_pos, match)
     else:
         if params.color:
-            sys.stdout.write(f"{getattr(Colors, params.color.upper())}")
-            print_human(match, file_name, line_no)
-            sys.stdout.write(f"{Colors.END}\n")
+            print_with_color(match, file_name, line_no)
         else:
             print_human(match, file_name, line_no)
 
@@ -62,6 +60,12 @@ def print_human(match, file_name, line_no):
     sys.stdout.write(f"Found match {match} in file {file_name}, line no {line_no}")
 
 
+def print_with_color(match, file_name, line_no):
+    sys.stdout.write(f"{getattr(Colors, params.color.upper())}")
+    print_human(match, file_name, line_no)
+    sys.stdout.write(f"{Colors.END}\n")
+
+
 parser = argparse.ArgumentParser(description="Find a specified pattern in a list of given files.")
 parser.add_argument("-p", "--pattern", action="store", help="Pattern to look for.")
 parser.add_argument("-f", "--files", nargs="+", help="path(s) to file(s) to find pattern in.")
@@ -69,13 +73,18 @@ parser.add_argument("-c", "--color", action="store", help="Colored output (Black
 parser.add_argument("-m", "--machine", action="store_true", default=False,
                     help="prints in machine-readable format: file_name:no_line:start_pos:matched_text")
 
-params = get_params()
-files_lines = []
-for file in params.files:
-    with open(file, "r") as f:
-        files_lines.append({"file_name": file, "lines": f.readlines()})
 
-for file in files_lines:
-    find_pattern(params.pattern, file["file_name"], file["lines"])
+def main():
+    global params
+    params = get_params()
+    files_lines = []
+    for file in params.files:
+        with open(file, "r") as f:
+            files_lines.append({"file_name": file, "lines": f.readlines()})
 
-sys.stdout.write(f"\n\nFinished parsing {len(params.files)} file(s).")
+    for file in files_lines:
+        find_pattern(params.pattern, file["file_name"], file["lines"])
+
+
+if __name__ == '__main__':
+    main()
