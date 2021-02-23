@@ -35,7 +35,3 @@ class TestPatternSearchScript(unittest.TestCase):
         (out, err) = process.communicate()
         expected_substring = "example:1:17:5353"
         self.assertTrue(expected_substring == out.decode('utf-8').rstrip(), "Program didn't detect pattern.")
-
-
-if __name__ == '__main__':
-    unittest.main()

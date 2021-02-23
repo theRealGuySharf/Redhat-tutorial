@@ -74,8 +74,7 @@ parser.add_argument("-m", "--machine", action="store_true", default=False,
                     help="prints in machine-readable format: file_name:no_line:start_pos:matched_text")
 
 
-def main():
-    global params
+if __name__ == '__main__':
     params = get_params()
     files_lines = []
     for file in params.files:
@@ -84,7 +83,3 @@ def main():
 
     for file in files_lines:
         find_pattern(params.pattern, file["file_name"], file["lines"])
-
-
-if __name__ == '__main__':
-    main()
