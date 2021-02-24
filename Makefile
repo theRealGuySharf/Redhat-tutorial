@@ -1,8 +1,8 @@
 DOCKERFILE = "./Dockerfile"
 
 build:
-    docker build -t testContainer -f ./Dockerfile
+	docker build --rm=false -t testcontainer .
 
 run:
-    docker cp search.py testContainer:/search.py
-    docker run -i -t --rm  -p=5555:5555 --name="testContainer"
+	docker cp search.py testcontainer:/search.py
+	docker run -i -t --rm  -p=5555:5555 --name="testcontainer"
